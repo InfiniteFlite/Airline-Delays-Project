@@ -1,1 +1,11 @@
+{% extends "layout.html" %}
 
+{% set active_page = "home" %}
+
+{% block title %}Home{% endblock %}
+
+    {% block content %}
+    <p>I have chosen data about airline delays across the US. It covers many reasons including: weather, security, airline issues, and more. The data can be found <a href="https://think.cs.vt.edu/corgis/json/airlines/" target="_blank" rel="noopener noreferrer">here</a></p>
+    <p>This data is about delays across numerous different airlines and airports. It goes from January of 2003 to January of 2016. <br> The 29 largest airports in the US are represented. These 29 airports had a combined 580 million passengers through them in 2016, that is 70% of annual US airline traffic. <a href="https://en.wikipedia.org/wiki/List_of_the_busiest_airports_in_the_United_States" target="_blank" rel="noopener noreferrer">(Source)</a></p>
+    <p>Depending on the year, each airport had between 7 and 15 different airlines report their numbers. This means that the totals may vary from year to year. I can account for these differences by using percents of data instead of the whole numbers, as these will vary depending on the number of airlines involved. </p>
+    {% endblock %}
