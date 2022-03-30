@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% set active_page = "Airport" %}
+
+{% block title %}Airport{% endblock %}
+
+    {% block content %}
+    <form action="/ShowAirportData">
+        <select name="airport">
+            {{ airport_options }}
+        </select>
+        <input type="submit" value="Get Data">
+    </form>
+
+    <br><br>
+    <p> The Year with the most delays for {{ airport_name }} was {{ airport_delay_year }} </p>
+    {% endblock %}
