@@ -9,9 +9,13 @@
         <select name="airport">
             {{ airport_options }}
         </select>
+        <br><br>
+        <select name="month">
+            {{ Month_Options }}
+        </select>
         <input type="submit" value="Get Data">
     </form>
 
     <br><br>
-    <p> The Year with the most delays for {{ airport_name }} was {{ airport_delay_year }} </p>
+    <p> {{ airport_delay_year }} </p>
     {% endblock %}
