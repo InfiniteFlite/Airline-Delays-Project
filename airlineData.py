@@ -39,24 +39,18 @@ def most_delayed_airport(code, month):
     with open('airlines.json') as airlines_data:
         data = json.load(airlines_data)
     if month == "Whole Year":
-        yearTotal = 0
-        busiestYear = 0
-        busiestYearTotal = 0
+        busiestYears = {}
         for a in data:
             if a["Airport"]["Code"] == code:
-                for y in range(2003, 2017):
-                    for m in range(1,13):
-                        if a["Time"]["Month"] == m and a["Time"]["Year"] == y:
-                            yearTotal += a["Statistics"]["Flights"]["Total"]
-                            if m == 12:
-                                if yearTotal > busiestYearTotal:
-                                    busiestYear = y
-                                    busiestYearTotal = yearTotal
-                                    yearTotal = 0
-                                    print(busiestYearTotal)
-                                else:
-                                    yearTotal = 0
-        return "The year where " + get_airport_full_name(code) + " was the most delayed was " + str(busiestYear)
+                        if a["Time"]["Year"] in busiestYears.keys():
+                            busiestYears[a["Time"]["Year"]] += a["Statistics"]["Flights"]["Total"]
+                        else:
+                            busiestYears[a["Time"]["Year"]] = a["Statistics"]["Flights"]["Total"]
+    biggestYear = 0
+    for b in busiestYears:
+        if b > biggestYear:
+            biggestYear = b
+            return "The year where " + get_airport_full_name(code) + " was the most delayed was " + str(busiestYear)
     else:
         currentBiggest = 0
         busiestYearForMonth = 0
@@ -77,18 +71,37 @@ def get_airport_full_name(code):
         if a["Airport"]["Code"] == code:
             return a["Airport"]["Name"].split(":")[0]
 
-def most_delayed_airline(airline):
+def most_delayed_airline(airline, month):
     with open('airlines.json') as airlines_data:
         data = json.load(airlines_data)
-    biggest = 0
-    busiestYear = 0
-    for a in data:
-        for x in a["Statistics"]["Carriers"]["Names"].split(","):
-            if x == airline:
-                if ((a["Statistics"]["Flights"]["Total"])/a["Statistics"]["Carriers"]["Total"]) > biggest:
-                    busiestYear = a["Time"]["Year"]
-                    biggest = a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"]
-    return busiestYear
+    if month == "Whole Year":
+        busiestYears = {}
+        for a in data:
+                for x in a["Statistics"]["Carriers"]["Names"].split(","):
+                    if x == airline:
+                        if a["Time"]["Year"] in busiestYears.keys():
+                            busiestYears[a["Time"]["Year"]] += a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"]
+                        else:
+                            busiestYears[a["Time"]["Year"]] = a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"]
+        biggestYear = 0
+        currentBiggestYear = 0
+        for b in busiestYears:
+            if busiestYears[b] > currentBiggestYear:
+                currentBiggestYear = busiestYears[b]
+                biggestYear = b
+        return "The year where " + airline + " was the most delayed was " + str(biggestYear)
+    else:
+        currentBiggest = 0
+        busiestYearForMonth = 0
+        for a in data:
+            if a["Time"]["Month Name"] == month:
+                for x in a["Statistics"]["Carriers"]["Names"].split(","):
+                    if x == airline:
+                        if a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"] > currentBiggest:
+                            currentBiggest = a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"]
+                            busiestYearForMonth = a["Time"]["Year"]
+        return "The year where " + month + " had the most delays for " + airline + " was " + str(busiestYearForMonth)
+
 
 @app.route("/")
 def render_main():
@@ -122,7 +135,7 @@ def show_airline_data():
     airline = request.args["airline"]
     month = request.args["month"]
     delayYear = most_delayed_airline(airline, month)
-    return render_template("airline.html", airline_options = a, Month_Options = m, airline_delay_year = delayYear, airline_name = airline, )
+    return render_template("airline.html", airline_options = a, Month_Options = m, airline_delay_year = delayYear)
 
 if __name__=="__main__":
     app.run(debug=True)
