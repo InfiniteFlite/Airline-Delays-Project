@@ -8,25 +8,26 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
          <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+         <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
          <title>{% block title %}{% endblock %} - Aviation Delay Data</title>
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-sm bg-light">
-
+<nav class="navbar navbar-expand-sm bg-dark">
+    <div class="mx-auto">
   <!-- Links -->
-  <ul class="navbar-nav">
-    <li class="nav-item">
-      <a class="nav-link" href="/">About</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/airport">Search By Airport</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/airline">Search By Airline</a>
-    </li>
-  </ul>
-
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/">About</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/airport">Search By Airport</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/airline">Search By Airline</a>
+        </li>
+    </ul>
+    </div>
 </nav>
         {% block content %}{% endblock %}
     </body>

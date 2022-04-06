@@ -5,17 +5,49 @@
 {% block title %}Airline{% endblock %}
 
     {% block content %}
+    <script>
+    window.onload = function () {
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true,
+	theme: "light2",
+	title:{
+		text: "Delays for {{ airline_chart_name }}"
+	},
+	data: [{
+		type: "line",
+      	indexLabelFontSize: 16,
+		dataPoints: [
+			{{ airline_chart_data }}
+		]
+	}]
+});
+chart.render();
+
+}
+</script>
+<br>
     <form action="/ShowAirlineData">
-        <select name="airline">
+        <div class="form-group">
+        <label for="airline">Select Airline:</label>
+        <select class="form-control" name="airline">
             {{ airline_options }}
         </select>
-        <br><br>
-        <select name="month">
+        </div>
+        <div class="form-group">
+        <label for="month">Select Month:</label>
+        <select class="form-control" name="month">
             {{ Month_Options }}
         </select>
-        <input type="submit" value="Get Data">
-    </form>
+        </div>
+        <div class="d-flex justify-content-center">
+        <input class="btn btn-primary" type="submit" value="Get Data">
+        </div>
 
     <br><br>
     <p> {{ airline_delay_year }} </p>
+    <br>
+    {% if airline_chart_data %}
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    {% endif %}
     {% endblock %}

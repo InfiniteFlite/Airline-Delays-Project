@@ -35,6 +35,33 @@ def get_month_options():
         options += Markup("<option value\"" + m + "\>" + m + "</option>")
     return options
 
+
+def get_airport_year_totals(code):
+    with open('airlines.json') as airlines_data:
+        data = json.load(airlines_data)
+    year_totals = {}
+    for a in data:
+        if a["Airport"]["Code"] == code:
+                    if a["Time"]["Year"] in year_totals.keys():
+                        year_totals[a["Time"]["Year"]] += a["Statistics"]["Flights"]["Total"]
+                    else:
+                        year_totals[a["Time"]["Year"]] = a["Statistics"]["Flights"]["Total"]
+
+    return year_totals
+
+def get_airline_year_totals(airline):
+    with open('airlines.json') as airlines_data:
+        data = json.load(airlines_data)
+    year_totals = {}
+    for a in data:
+            for x in a["Statistics"]["Carriers"]["Names"].split(","):
+                if x == airline:
+                    if a["Time"]["Year"] in year_totals.keys():
+                        year_totals[a["Time"]["Year"]] += a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"]
+                    else:
+                        year_totals[a["Time"]["Year"]] = a["Statistics"]["Flights"]["Total"]/a["Statistics"]["Carriers"]["Total"]
+    return year_totals
+
 def most_delayed_airport(code, month):
     with open('airlines.json') as airlines_data:
         data = json.load(airlines_data)
@@ -46,11 +73,11 @@ def most_delayed_airport(code, month):
                             busiestYears[a["Time"]["Year"]] += a["Statistics"]["Flights"]["Total"]
                         else:
                             busiestYears[a["Time"]["Year"]] = a["Statistics"]["Flights"]["Total"]
-    biggestYear = 0
-    for b in busiestYears:
-        if b > biggestYear:
-            biggestYear = b
-            return "The year where " + get_airport_full_name(code) + " was the most delayed was " + str(busiestYear)
+        biggestYear = 0
+        for b in busiestYears:
+            if b > biggestYear:
+                biggestYear = b
+        return "The year where " + get_airport_full_name(code) + " was the most delayed was " + str(biggestYear)
     else:
         currentBiggest = 0
         busiestYearForMonth = 0
@@ -61,9 +88,6 @@ def most_delayed_airport(code, month):
                     currentBiggest = a["Statistics"]["Flights"]["Total"]
         return "The year where " + month + " had the most delays at " + get_airport_full_name(code) + " was " + str(busiestYearForMonth)
 
-
-
-
 def get_airport_full_name(code):
     with open('airlines.json') as airlines_data:
         data = json.load(airlines_data)
@@ -72,9 +96,9 @@ def get_airport_full_name(code):
             return a["Airport"]["Name"].split(":")[0]
 
 def most_delayed_airline(airline, month):
-    with open('airlines.json') as airlines_data:
+     with open('airlines.json') as airlines_data:
         data = json.load(airlines_data)
-    if month == "Whole Year":
+     if month == "Whole Year":
         busiestYears = {}
         for a in data:
                 for x in a["Statistics"]["Carriers"]["Names"].split(","):
@@ -90,7 +114,7 @@ def most_delayed_airline(airline, month):
                 currentBiggestYear = busiestYears[b]
                 biggestYear = b
         return "The year where " + airline + " was the most delayed was " + str(biggestYear)
-    else:
+     else:
         currentBiggest = 0
         busiestYearForMonth = 0
         for a in data:
@@ -102,6 +126,21 @@ def most_delayed_airline(airline, month):
                             busiestYearForMonth = a["Time"]["Year"]
         return "The year where " + month + " had the most delays for " + airline + " was " + str(busiestYearForMonth)
 
+def get_airport_chart_data(code):
+    totals = get_airport_year_totals(code)
+
+    data = ""
+    for a in totals:
+        data += Markup("{ label:\"" + str(a) + "\"," + "y:" + str(totals[a]) + "},")
+    return data
+
+def get_airline_chart_data(airline):
+    totals = get_airline_year_totals(airline)
+
+    data = ""
+    for a in totals:
+        data += Markup("{ label:\"" + str(a) + "\"," + "y:" + str(totals[a]) + "},")
+    return data
 
 @app.route("/")
 def render_main():
@@ -126,7 +165,8 @@ def show_airport_data():
     airport = request.args["airport"]
     month = request.args["month"]
     delayYear = most_delayed_airport(airport, month)
-    return render_template("airport.html", airport_options = s, Month_Options = m, airport_delay_year = delayYear)
+    data = get_airport_chart_data(airport)
+    return render_template("airport.html", airport_options = s, Month_Options = m, airport_delay_year = delayYear, chart_data_airport = data, airport_name_chart = get_airport_full_name(airport))
 
 @app.route("/ShowAirlineData")
 def show_airline_data():
@@ -135,7 +175,8 @@ def show_airline_data():
     airline = request.args["airline"]
     month = request.args["month"]
     delayYear = most_delayed_airline(airline, month)
-    return render_template("airline.html", airline_options = a, Month_Options = m, airline_delay_year = delayYear)
+    data = get_airline_chart_data(airline)
+    return render_template("airline.html", airline_options = a, Month_Options = m, airline_delay_year = delayYear, airline_chart_data = data, airline_chart_name = airline)
 
 if __name__=="__main__":
     app.run(debug=True)
